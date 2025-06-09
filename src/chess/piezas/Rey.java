@@ -18,7 +18,7 @@ public class Rey extends Pieza {
                                       Pieza[][] tablero) {
         int diffFila = Math.abs(filaDestino - filaOrigen);
         int diffCol = Math.abs(columnaDestino - columnaOrigen);
-        // Movimiento normal: una casilla en cualquier dirección.
+        // Una casilla hacia cualquier lado, sin quedarse quieto al "moverse"
         return (diffFila <= 1 && diffCol <= 1) && !(diffFila == 0 && diffCol == 0);
     }
 }
