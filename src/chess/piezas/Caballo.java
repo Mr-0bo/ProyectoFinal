@@ -13,6 +13,7 @@ public class Caballo extends Pieza {
     }
 
     @Override
+    // Movimiento en L: Dos casillas en una direccion y una en otrra
     public boolean esMovimientoValido(int filaOrigen, int columnaOrigen,
                                       int filaDestino, int columnaDestino,
                                       Pieza[][] tablero) {
