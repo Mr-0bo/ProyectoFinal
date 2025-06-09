@@ -17,6 +17,7 @@ public class Torre extends Pieza {
     public boolean esMovimientoValido(int filaOrigen, int columnaOrigen,
                                       int filaDestino, int columnaDestino,
                                       Pieza[][] tablero) {
+        // Misma fila o misma columna
         if (filaOrigen == filaDestino || columnaOrigen == columnaDestino) {
             return Tablero.caminoLibre(filaOrigen, columnaOrigen, filaDestino, columnaDestino, tablero);
         }
