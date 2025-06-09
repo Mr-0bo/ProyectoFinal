@@ -104,8 +104,18 @@ public class Tablero extends JPanel {
         if (coord.length() != 2) return null;
         char archivo = coord.charAt(0);
         char filaChar = coord.charAt(1);
+        // 97: a
+        // 98: b
+        // 99: c
+        // 100: d
+        // 101: e
+        // 102: f
+        // 103: g
+        // 104: h
         int col = archivo - 'a';
+        // 8 - (filaChar) = Casilla valida
         int fila = 8 - Character.getNumericValue(filaChar);
+        // Validacion de rango
         if (fila < 0 || fila > 7 || col < 0 || col > 7) return null;
         return new int[]{fila, col};
     }
@@ -117,11 +127,13 @@ public class Tablero extends JPanel {
             int vacio = 0;
             for (int j = 0; j < 8; j++) {
                 Pieza p = tablero[i][j];
+                // +1 por cada casilla vacia
                 if (p == null) {
                     vacio++;
                 } else {
                     if (vacio > 0) {
                         fen.append(vacio);
+                        // Reinicio del contador
                         vacio = 0;
                     }
                     fen.append(getSimboloFEN(p));
@@ -130,10 +142,12 @@ public class Tablero extends JPanel {
             if (vacio > 0)
                 fen.append(vacio);
             if (i < 7)
+                // Separador entre filas
                 fen.append("/");
         }
         fen.append(" ");
         fen.append(colorActivo == Color.BLANCO ? "w" : "b");
+        // Flancos De Enroque - Casilla De En Passant - Medios Movimientos - Numero De jugada
         fen.append(" - - 0 1");
         return fen.toString();
     }
@@ -154,14 +168,18 @@ public class Tablero extends JPanel {
         return "";
     }
 
-    // Verificar si las casillas estan libres
     public static boolean caminoLibre(int filaOrigen, int colOrigen, int filaDestino, int colDestino, Pieza[][] tablero) {
+        // Destino > Origen: 1, Hacia abajo/derecha
+        // Destino < filaOrigen: -1, Hacia arriba/izquierda
+        // Destino = Origen: Sin movimiento en esa direccion
         int pasoFila = Integer.compare(filaDestino, filaOrigen);
         int pasoCol = Integer.compare(colDestino, colOrigen);
+        // Se ignora casilla de origen
         int filaActual = filaOrigen + pasoFila;
         int colActual = colOrigen + pasoCol;
         while (filaActual != filaDestino || colActual != colDestino) {
             if (tablero[filaActual][colActual] != null)
+                //Casilla ocupada
                 return false;
             filaActual += pasoFila;
             colActual += pasoCol;
