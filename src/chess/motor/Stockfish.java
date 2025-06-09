@@ -27,7 +27,6 @@ public class Stockfish {
         }
     }
 
-    // Solicita el mejor movimiento para la posición FEN dada y un tiempo de búsqueda (ms)
     public String obtenerMejorMovimiento(String fen, int tiempoMs) {
         enviarComando("position fen " + fen);
         enviarComando("go movetime " + tiempoMs);
@@ -36,6 +35,7 @@ public class Stockfish {
             String linea;
             while ((linea = lector.readLine()) != null) {
                 if (linea.startsWith("bestmove")) {
+                    // "bestmove" + movimiento
                     mejorMovimiento = linea.split(" ")[1];
                     break;
                 }
