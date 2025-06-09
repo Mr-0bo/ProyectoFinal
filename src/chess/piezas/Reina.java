@@ -19,7 +19,7 @@ public class Reina extends Pieza {
                                       Pieza[][] tablero) {
         int diffFila = Math.abs(filaDestino - filaOrigen);
         int diffCol = Math.abs(columnaDestino - columnaOrigen);
-        // La reina se mueve como torre o alfil.
+        // Misma fila o misma columna o diagonal
         if (filaOrigen == filaDestino || columnaOrigen == columnaDestino || diffFila == diffCol) {
             return Tablero.caminoLibre(filaOrigen, columnaOrigen, filaDestino, columnaDestino, tablero);
         }
