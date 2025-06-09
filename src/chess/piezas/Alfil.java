@@ -14,6 +14,7 @@ public class Alfil extends Pieza {
     }
 
     @Override
+    // Movimiento en diagonal
     public boolean esMovimientoValido(int filaOrigen, int columnaOrigen,
                                       int filaDestino, int columnaDestino,
                                       Pieza[][] tablero) {
