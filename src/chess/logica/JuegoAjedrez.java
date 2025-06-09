@@ -7,6 +7,7 @@ import chess.gui.MenuPrincipal;
 import chess.gui.Tablero;
 import chess.piezas.Peon;
 import chess.piezas.Pieza;
+import java.time.LocalTime;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,7 +69,7 @@ public class JuegoAjedrez extends JFrame {
         }
 
 
-        // PANEL NORTE: Captura de negras
+        // Panel norte
         JPanel panelNorte = new JPanel(new BorderLayout());
         areaCapturasNegras = new JTextArea(1, 30);
         areaCapturasNegras.setEditable(false);
@@ -77,7 +78,7 @@ public class JuegoAjedrez extends JFrame {
         scrollCapturasNegras.setPreferredSize(new Dimension(0, 30));
         panelNorte.add(scrollCapturasNegras, BorderLayout.CENTER);
 
-        // PANEL SUR: Captura de blancas
+        // Panel sur
         JPanel panelSur = new JPanel(new BorderLayout());
         areaCapturasBlancas = new JTextArea(1, 30);
         areaCapturasBlancas.setEditable(false);
@@ -86,7 +87,7 @@ public class JuegoAjedrez extends JFrame {
         scrollCapturasBlancas.setPreferredSize(new Dimension(0, 30));
         panelSur.add(scrollCapturasBlancas, BorderLayout.CENTER);
 
-        // PANEL ESTE: Historial y otros datitos
+        // Panel este
         JPanel panelInfoHistorial = new JPanel();
         panelInfoHistorial.setLayout(new BoxLayout(panelInfoHistorial, BoxLayout.Y_AXIS));
         labelTurno = new JLabel("Turno: " + (motor.getTurnoActual() == Color.BLANCO ? "Blancas" : "Negras"));
@@ -103,11 +104,11 @@ public class JuegoAjedrez extends JFrame {
         scrollHistorial.setPreferredSize(new Dimension(250, 0));
         panelInfoHistorial.add(scrollHistorial);
 
-        // PANEL CENTRAL: Contenedor del tablero
+        // Panel central
         JPanel panelCentro = new JPanel(new BorderLayout());
         panelCentro.add(panelTablero, BorderLayout.CENTER);
 
-        //PANEL OESTE con botón de Menú Principal
+        //Panel oeste
         JPanel panelOeste = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton botonMenu = new JButton("Menú Principal");
         botonMenu.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -120,7 +121,7 @@ public class JuegoAjedrez extends JFrame {
         });
         panelOeste.add(botonMenu);
 
-        // ORGANIZAR el layout
+        // Organizacion
         setLayout(new BorderLayout());
         add(panelNorte, BorderLayout.NORTH);
         add(panelSur, BorderLayout.SOUTH);
@@ -128,7 +129,7 @@ public class JuegoAjedrez extends JFrame {
         add(panelInfoHistorial, BorderLayout.EAST);
         add(panelOeste, BorderLayout.WEST);
 
-        // Asignar ActionListener a cada celda del tablero.
+        // ActionListener en cada casilla
         for (int fila = 0; fila < 8; fila++) {
             for (int col = 0; col < 8; col++) {
                 JButton boton = panelTablero.getCelda(fila, col);
@@ -145,16 +146,21 @@ public class JuegoAjedrez extends JFrame {
 
     private void manejarClicCelda(int fila, int col) {
         Pieza p = panelTablero.getPieza(fila, col);
+        // Sentinela de seleccion
         if (filaSeleccionada == -1 && columnaSeleccionada == -1) {
+            // Seleccion para jugador en turno
             if (p != null && p.getColor() == motor.getTurnoActual()) {
                 filaSeleccionada = fila;
                 columnaSeleccionada = col;
+                // Resaltar la celda
                 panelTablero.getCelda(fila, col).setBorder(BorderFactory.createLineBorder(java.awt.Color.YELLOW, 3));
                 labelSeleccion.setText("Selección: " + p.getSimbolo());
             } else {
                 labelSeleccion.setText("Selección: Ninguna");
             }
         } else {
+            // TRUE: Se ejecutó
+            // FALSE: Ilegal
             boolean movRealizado = motor.hacerMovimiento(filaSeleccionada, columnaSeleccionada, fila, col);
             limpiarBordes();
             actualizarHistorial();
@@ -165,17 +171,20 @@ public class JuegoAjedrez extends JFrame {
             labelTurno.setText("Turno: " + (motor.getTurnoActual() == Color.BLANCO ? "Blancas" : "Negras"));
             // Promociones
             Pieza movida = panelTablero.getPieza(fila, col);
+            // Es peon? Esta en la fila del rival?
             if (movida instanceof Peon) {
                 if ((movida.getColor() == Color.BLANCO && fila == 0) ||
                         (movida.getColor() == Color.NEGRO && fila == 7)) {
                     Pieza promocion = DialogoPromocion.mostrarDialogoPromocion(movida.getColor());
                     panelTablero.tablero[fila][col] = promocion;
                     panelTablero.actualizarTablero();
+                    // Se actualiza el ultimo movimiento
                     java.util.List<String> hist = motor.getHistorialMovimientos();
                     int index = hist.size() - 1;
                     hist.set(index, hist.get(index) + " (Promoción a " + promocion.getSimbolo() + ")");
                 }
             }
+            //Verificacion de Mate
             if (motor.estaElReyEnJaque(motor.getTurnoActual()) &&
                     !motor.tieneMovimientoLegal(motor.getTurnoActual())) {
                 String ganador = (motor.getTurnoActual() == Color.BLANCO) ? "Negras" : "Blancas";
@@ -183,6 +192,7 @@ public class JuegoAjedrez extends JFrame {
                 guardarHistorial(ganador, motor.getHistorialMovimientos());
                 labelTurno.setText("Turno: " + (motor.getTurnoActual() == Color.BLANCO ? "Blancas" : "Negras"));
             } else {
+                // Si no hay mate, se sigue
                 labelTurno.setText("Turno: " + (motor.getTurnoActual() == Color.BLANCO ? "Blancas" : "Negras"));
             }
 
@@ -206,9 +216,11 @@ public class JuegoAjedrez extends JFrame {
 
     private void actualizarCapturas() {
         StringBuilder sbNegras = new StringBuilder();
+        // Capturas
         for (Pieza p : motor.getCapturasNegras()) {
             sbNegras.append(p.getSimbolo()).append(" ");
         }
+        // Total + (puntos) + pts
         sbNegras.append(" (Total: ").append(motor.getPuntosCapturas(motor.getCapturasNegras())).append(" pts)");
         areaCapturasNegras.setText(sbNegras.toString());
 
@@ -219,12 +231,16 @@ public class JuegoAjedrez extends JFrame {
         sbBlancas.append(" (Total: ").append(motor.getPuntosCapturas(motor.getCapturasBlancas())).append(" pts)");
         areaCapturasBlancas.setText(sbBlancas.toString());
     }
-    // No funciona lol, parte olvidada
+
+    // Debes mejorarlo :p
     private void guardarHistorial(String ganador, java.util.List<String> movimientos) {
         try (java.io.PrintWriter out = new java.io.PrintWriter(new java.io.FileWriter("historialJuegos.txt", true))) {
+            LocalTime hora = LocalTime.now();
+            out.println("Hora:: " + hora);
             out.println("Ganador: " + ganador);
             out.println(motor.getHistorialFormateado());
             out.println("------");
+        // Crashes
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
@@ -235,15 +251,20 @@ public class JuegoAjedrez extends JFrame {
             try {
                 String fen = panelTablero.getFEN(Color.NEGRO);
                 String mejorMov = stockfish.obtenerMejorMovimiento(fen, tiempoIA);
+                // Movimiento valido, notacion algebraica
                 if (mejorMov != null && mejorMov.length() >= 4) {
+                    // Extraer coords origen y destino
                     String origen = mejorMov.substring(0, 2);
                     String destino = mejorMov.substring(2, 4);
+                    // Traductor
                     int[] coordOrigen = Tablero.parsearCoordenada(origen);
                     int[] coordDestino = Tablero.parsearCoordenada(destino);
                     SwingUtilities.invokeLater(() -> {
+                        // Realizar movimiento
                         motor.hacerMovimiento(coordOrigen[0], coordOrigen[1], coordDestino[0], coordDestino[1]);
                         actualizarHistorial();
                         actualizarCapturas();
+                        // Verificacion de mate
                         if (motor.estaElReyEnJaque(motor.getTurnoActual()) &&
                                 !motor.tieneMovimientoLegal(motor.getTurnoActual())) {
                             String ganador = (motor.getTurnoActual() == Color.BLANCO) ? "Negras" : "Blancas";
@@ -253,6 +274,7 @@ public class JuegoAjedrez extends JFrame {
                         labelTurno.setText("Turno: " + (motor.getTurnoActual() == Color.BLANCO ? "Blancas" : "Negras"));
                     });
                 }
+            // Crashes
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
